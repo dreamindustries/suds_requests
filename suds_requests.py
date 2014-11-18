@@ -2,11 +2,7 @@ import functools
 import requests
 import suds.transport as transport
 import traceback
-
-try:
-    import cStringIO as StringIO
-except ImportError:
-    import StringIO
+import io
 
 
 __all__ = ['RequestsTransport']
@@ -38,7 +34,7 @@ class RequestsTransport(transport.Transport):
     @handle_errors
     def open(self, request):
         resp = self._session.get(request.url)
-        return StringIO.StringIO(resp.content)
+        return io.StringIO(resp.content)
 
     @handle_errors
     def send(self, request):
