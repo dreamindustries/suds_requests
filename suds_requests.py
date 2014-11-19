@@ -18,11 +18,6 @@ def handle_errors(f):
                 'Error in requests\n' + traceback.format_exc(),
                 e.response.status_code,
             )
-        except requests.RequestException:
-            raise transport.TransportError(
-                'Error in requests\n' + traceback.format_exc(),
-                000
-            )
     return wrapper
 
 
