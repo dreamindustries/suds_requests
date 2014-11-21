@@ -8,36 +8,24 @@ import io
 __all__ = ['RequestsTransport']
 
 
-def handle_errors(f):
-    @functools.wraps(f)
-    def wrapper(*args, **kwargs):
-        try:
-            return f(*args, **kwargs)
-        except requests.HTTPError as e:
-            raise transport.TransportError(
-                'Error in requests\n' + traceback.format_exc(),
-                e.response.status_code,
-            )
-    return wrapper
-
-
 class RequestsTransport(transport.Transport):
     def __init__(self, session=None):
         transport.Transport.__init__(self)
         self._session = session or requests.Session()
 
-    @handle_errors
     def open(self, request):
         resp = self._session.get(request.url)
         return io.BytesIO(resp.content)
 
-    @handle_errors
     def send(self, request):
         resp = self._session.post(
             request.url,
             data=request.message,
             headers=request.headers,
         )
+
+        resp.raise_for_status()
+
         return transport.Reply(
             resp.status_code,
             resp.headers,
